@@ -2,15 +2,15 @@
 /* from http://stackoverflow.com/a/23393920 */
 
 .highlight pre code * {
-  white-space: nowrap;    // this sets all children inside to nowrap
+  white-space: nowrap;    
 }
 
 .highlight pre {
-  overflow-x: auto;       // this sets the scrolling in x
+  overflow-x: auto;       
 }
 
 .highlight pre code {
-  white-space: pre;       // forces <code> to respect <pre> formatting
+  white-space: pre;       
 }
 
 
@@ -97,13 +97,13 @@
 }
 
 .highlight table {
-  margin-bottom: 0px;
+  margin: 0px;
+  /*border: 1px solid #ccc;*/
+  /*border-radius: 3px;*/
 }
 
 .highlight pre {
-  margin: 0px;
-  border: none;
-  border-radius:0px;
+  margin: 5px 0;
 }
 
 .highlight .table>tbody>tr>td {
@@ -113,14 +113,26 @@
 
 td.gutter.gl {
     width:10px;
-    opacity: 0.6;
+    opacity: 0.7;
     text-align: left;
-}
-
-.highlight table {
-  border: 1px solid #ccc;
 }
 
 .highlight td.code pre {
   padding-left: 20px;
+  border-left: none;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.highlight pre.lineno {
+  border:1px solid #ccc;
+  border-bottom-left-radius: 3px;
+  border-top-left-radius: 3px;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
 }

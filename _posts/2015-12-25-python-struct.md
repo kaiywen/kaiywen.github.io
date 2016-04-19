@@ -4,7 +4,7 @@ title:      "Python中struct模块的用法"
 subtitle:   ""
 date:       2015-12-25 19:45:00
 author:     "YuanBao"
-header-img: "img/post-bg-re-vs-ng2.jpg"
+header-img: "img/post-python.jpg"
 header-mask: 0.25
 catalog: true
 tags:
@@ -24,7 +24,7 @@ struct.pack(fmt, v1, v2, ...)
 struct.unpack(fmt, string)
 struct.calcsize(fmt)
 ```
-第一个函数`pack`负责将不同的变量打包在一起，成为一个字节字符串，即类似于C语言中的字节流。第二个函数`unpack`将字节字符串解包成为变量。第三个函数`calsize`计算按照格式 fmt 打包的结果有多少个字节。这里打包格式 fmt 确定了将变量按照什么方式打包成字节流，其包含了一系列的格式字符串。这里就不再给出不同格式字符串的含义了，详细细节可以参照[Python Doc (struct)](https://docs.python.org/2/library/struct.html).
+第一个函数`pack`负责将不同的变量打包在一起，成为一个字节字符串，即类似于C语言中的字节流。第二个函数`unpack`将字节字符串解包成为变量。第三个函数`calsize`计算按照格式 fmt 打包的结果有多少个字节。这里打包格式 fmt 确定了将变量按照什么方式打包成字节流，其包含了一系列的格式字符串。这里就不再给出不同格式字符串的含义了，详细细节可以参照[Python Doc (struct)][1].
 
 ## 使用struct打包定长结构
 一般而言，在使用struct的时候，要打包的数据都是定长的。定长的数据代表你需要明确给出要打包的或者解包的数据长度，否则打包解包函数将会出错。下面用例子说明什么是定长打包：
@@ -39,6 +39,7 @@ print b
 
 ## 输出 (12, 34, 'abc', 56)
 ```
+
 上面的代码将两个整数12和34，一个字符串"abc"和一个整数56一起打包成为一个字节字符流，然后再解包。其中打包格式中明确指出了打包的长度："2I"表明起始是两个`unsigned int`，"3s"表明长度为4的字符串，最后一个"I"表示最后紧跟一个`unsigned int`。所以上面的打印b输出结果是：(12, 34, 'abc', 56)。
 
 我们可以调用`calcsize()`来计算"2I3sI"这个模式占用的字节数：
@@ -47,6 +48,7 @@ print b
 print struct.calcsize("2I3sI")
 ## 输出 16
 ```
+
 可以看到上面的三个整型加一个3字符的字符串一共占用了16个字节。为什么会是16个字节呢？不应该是15个字节吗？其实，在struct的打包过程中，根据特定类型的要求，必须进行字节对齐。由于默认`unsigned int`型占用四个字节，因此要在字符串的位置进行4字节对齐，因此即使是3个字符的字符串也要占用4个字节。
 
 再看一下不需要字节对齐的模式：
@@ -99,3 +101,4 @@ data_content = data[i:]
 由于报文的长度len(s)我们使用定长的整型"I"进行了打包，所以解包的时候我们可以先将报文长度获取出来，之后再根据报文长度读取报文内容。
 
 
+[1]:	https://docs.python.org/2/library/struct.html
