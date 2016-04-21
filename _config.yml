@@ -8,15 +8,16 @@ keyword: ""
 url: "http://kaiyuan.me"              # your host, for absolute URL
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
-
+BASE_PATH:
+archive_path: archives
 
 # SNS settings
 RSS: true
 weibo_username:     littleyuanbao
 zhihu_username:     yuan-bao-87
 github_username:    yuanbaohundan
-#twitter_username:  
-#facebook_username: 
+#twitter_username:
+#facebook_username:
 
 
 
@@ -33,7 +34,6 @@ anchorjs: true                          # if you want to customize anchor. check
 # Gems
 # from PR#40, to support local preview for Jekyll 3.0
 gems: [jekyll-paginate]
-
 
 
 # Markdown settings
@@ -59,7 +59,7 @@ kramdown:
 
 
 # Disqus settings
-disqus_username: acoderisalsoapoet 
+disqus_username: acoderisalsoapoet
 
 # Duoshuo settings
 #duoshuo_username: kaiyuanblog
