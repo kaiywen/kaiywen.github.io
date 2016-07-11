@@ -23,8 +23,8 @@ pre {
  * Courtesy of GitHub.com
  */
 
-.highlight pre { background-color: rgba(48, 68, 94, 0.99);}
-.highlight .hll { background-color: #272822; }
+.highlight pre { background-color: rgba(30, 61, 101, 0.99); }
+.highlight .hll { background-color: rgba(30, 61, 101, 0.99); }
 .highlight .c { color: #75715e } /* Comment */
 .highlight .err { color: #960050; background-color: #1e0010 } /* Error */
 .highlight .k { color: #66d9ef } /* Keyword */
@@ -33,7 +33,7 @@ pre {
 .highlight .o { color: #f92672 } /* Operator */
 .highlight .p { color: #f8f8f2 } /* Punctuation */
 .highlight .cm { color: #75715e } /* Comment.Multiline */
-.highlight .cp { color: #75715e } /* Comment.Preproc */
+.highlight .cp { color: #47fc93 } /* Comment.Preproc */
 .highlight .c1 { color: #75715e } /* Comment.Single */
 .highlight .cs { color: #75715e } /* Comment.Special */
 .highlight .ge { font-style: italic } /* Generic.Emph */
@@ -88,6 +88,10 @@ pre {
 .highlight .gu { color: #75715e; } /* Generic.Subheading & Diff Unified/Comment? */
 .highlight .gd { color: #f92672; } /* Generic.Deleted & Diff Deleted */
 .highlight .gi { color: #a6e22e; } /* Generic.Inserted & Diff Inserted */
+
+
+/*######################*/
+
 
 
  .hightlight pre a:first-of-type::before {
