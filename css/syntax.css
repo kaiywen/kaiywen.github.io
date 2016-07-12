@@ -111,7 +111,7 @@ pre {
 }
 
 .highlight pre {
-  margin: 5px 0 5px -1px;
+  margin: 0 0 0 -1px;
 }
 
 .highlight .table>tbody>tr>td {
@@ -128,15 +128,11 @@ td.gutter.gl {
 .highlight td.code pre {
   padding-left: 20px;
   border:none;
-  /*border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  border-right: 1px solid #ccc;*/
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
 }
 
 .highlight pre.lineno {
-  /*border:1px solid #ccc;*/
   border:none;
   border-bottom-left-radius: 3px;
   border-top-left-radius: 3px;
@@ -147,6 +143,6 @@ td.gutter.gl {
 }
 
 div.highlighter-rouge {
-margin-top: 30px;
-margin-bottom: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }

@@ -82,8 +82,8 @@ ba_track_id: 04d9d4f6927f450c25ad34833d39f403
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "The best way to predict the future is to invent it!"
-sidebar-avatar: /img/wky.png      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-about-description: "The best way to predict the future is to invent it !"
+sidebar-avatar: /img/wky.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
