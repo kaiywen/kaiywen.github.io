@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "『译』Protocol Buffer 基础：Python"
+title:      "Protocol Buffer 基础：Python"
 subtitle:   ""
 date:       2016-7-10
 author:     "YuanBao"
@@ -12,9 +12,11 @@ tags:
  - protobuf
 ---
 
+## 前言
+
 这篇文章为 Python 编程者提供了一个使用 protobuf 的基本教程。下文通过创建一个简单的应用，向你展示了三点主要内容：
 
-* 怎样在一个 `.proto` 文件中定义消息格式
+* 怎样在一个 `.proto` 文件中定义消息（Message）格式
 * 怎样使用 protobuf 的的编译器
 * 怎样利用 protobuf 的 API 来读写消息
 
@@ -74,6 +76,89 @@ message AddressBook {
 消息中的每一个字段都必须通过如下的修饰符来标识：
 
 * `required`：表明该字段必须提供值，否则该消息将会被认为是『未初始化』。尝试序列化一个未初始化的消息将会抛出一个异常，而尝试解码一个未初始化的消息将会直接失败。除了这点以外，一个 `required` 的字段和一个 `optional` 字段的表现完全一样。
-* `optional`：该字段可以设置或者不设置值。如果没有对 `optional` 的字段设置值，那么它将自动拥有一个默认的值。对于简单的类型，你可以自行指定默认值，例如上述代码中 `PhoneNumber` 中的 `PhoneType`。如果为自行指定默认值，系统将会为其设置默认值：数值类型将被设置成为0，字符串类型被设置成空字符串，布尔类型被设置成为 `false`。对于嵌入的消息，其默认值总是它默认的实例或者原型。
+* `optional`：该字段可以设置或者不设置值。如果没有对 `optional` 的字段设置值，那么它将自动拥有一个默认的值。对于简单的类型，你可以自行指定默认值，例如上述代码中 `PhoneNumber` 中的 `PhoneType`。如果为未自行指定默认值，系统将会为其设置默认值：数值类型将被设置成为 0，字符串类型被设置成空字符串，布尔类型被设置成为 `false`。对于嵌入的消息类型，其默认值总是它默认的实例或者原型。默认的实例中所有的字段都未设置值。当获取一个没有被显示设置值的 `optinal` 字段时总是会返回这个字段的默认值。
+* `repeated`：这种字段可以将值重复设置并连接起来，并且这些值在 protobuf 中的顺序将会得以保存。你可以将 `repeated` 字段看成是一种具有动态容量的数组。
+
+<p class="caution">Required 字段注意事项：你应该非常谨慎的将字段定义为 required. 如果在后续的某个时刻，你不想再使用一个 required 字段，那么直接将其改为 optional 将会引起问题 -- 旧的协议读取代码将会认为不带有该字段的消息是不完全的并且将会拒绝或者无意地丢弃它们。事实上，你应该为你的 buffers 编写一些应用相关的定制的验证规则。Google 的一些工程师甚至认为使用 required 字段弊大于利，他们倾向于仅仅使用 optional 和 repeated 字段。然而，这种说法并没有达成普遍共识。</p>
+
+在教程 [Protocol Buffer Language Guide](https://developers.google.com/protocol-buffers/docs/proto)里，你将可以学到所有有关 `.proto` 文件的写法。不要尝试着去寻找类继承之类的语法，protobuf 不支持那一套。
+
+## 编译 Protocol Buffers
+
+现在已经有了一个 `.proto` 文件，接下来需要做的是生成一个你可以读写 `AddressBook` 的类。为了完成这点，你需要运行 protobuf 的编译器 `protoc` 来编译你的 `.proto` 文件：
+
+1. 如果你还没有安装 `protoc` 编译器，你可以在[这里](https://developers.google.com/protocol-buffers/docs/downloads.html)下载并且按照指导安装它。
+2. 接下来你可以运行编译器，你需要指定你的源文件目录（即你的 `.proto` 文件所在的目录，如果未指定，将会使用当前的目录），生成类的目标文件目录以及你的 `.proto` 的文件路径，例如在本例中，你可以使用输出选项 `--python_out` 生成 Python 中的类：
+
+```shell
+    protoc -I=$SRC_DIR --python_out=$DST_DIR $SRC_DIR/addressbook.proto
+```
+
+## Protobuf API
+
+不像你使用 Java 或者 C++ 的 protobuf 代码一样，Python 的 protobuf 编译器并不会直接为你生成存取数据的代码。相反的，它为你的消息，枚举类型以及一些莫名其妙的空类产生一种特殊的描述符，每一种消息都有其自己的描述符：
+
+```python
+class Person(message.Message):
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+
+    class PhoneNumber(message.Message):
+        __metaclass__ = reflection.GeneratedProtocolMessageType
+        DESCRIPTOR = _PERSON_PHONENUMBER
+    DESCRIPTOR = _PERSON
+
+class AddressBook(message.Message):
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _ADDRESSBOOK
+```
+
+每一行中的 `__metaclass__ = reflection.GeneratedProtocolMessageType` 非常重要，它们控制了 Python 中的元类（Metaclass）构建 Python 类 （Class）的方式。在代码装载时，元类 `GeneratedProtocolMessageType` 将会使用指定的描述符来创建那些与你需要使用的消息相关的 Python 方法，并且将他们放到 Python 类中，之后你就可以在你的代码中使用这些生成的 Python 类代码。
+
+最终的效果就是，在 Python 代码中，你可以向 Message 中定义字段的结构一样来使用这些类，例如：
+
+```python
+import addressbook_pb2
+person = addressbook_pb2.Person()
+person.id = 1234
+person.name = "John Doe"
+person.email = "jdoe@example.com"
+phone = person.phone.add()
+phone.number = "555-4321"
+phone.type = addressbook_pb2.Person.HOME
+``` 
+
+注意上述这些代码并不仅仅只是将一些新的字段加入到 Python 对象中。如果你尝试添加一个未在 `.proto` 文件中定义的字段，程序将会抛出 `AttributeError`，如果你尝试为一个字段指定错误的类型，代码也将抛出 `TypeError` 异常。同时，获取一个未被设置的字段将会得到其默认值。
+
+```python
+person.no_such_field = 1  # raises AttributeError
+person.id = "1234"        # raises TypeError
+```
+
+如果你想要了解 protobuf 编译器针对某种特殊的字段定义将会产生什么样的类成员，可以查看 [Python generated code reference](https://developers.google.com/protocol-buffers/docs/reference/python-generated).
+
+#### 枚举类型
+
+枚举类型将会被元类扩展成为一组有符号的整型常数。因此例子中的常数 `addressbook_pb2.Person.Work` 将被赋予常数值 2.
+
+#### 标准的消息方法
+
+每一个生成的类也包含了其他一些方法来供你检查或者操纵整个消息，这些方法包括：
+
+* `IsInitialized()`：检查是否所有的 `required` 字段都被设置相应值。
+* `__str__()`：返回一个易于人类阅读的消息字符串。该函数非常适合 Bug 调试。（例如使用 `str(message)` 或者 `print message`.）
+* `CopyFrom(other_msg)`：将消息内容改写为 `other_msg` 的内容。
+* `Clear()`：将消息中的所有元素清空到空状态。
+
+对于更多的函数，请查看 [complete API documentation for Message](https://developers.google.com/protocol-buffers/docs/reference/python/google.protobuf.message.Message-class)
+
+#### 读取消息和序列化消息
+
+每一个 protobuf 类都提供读取或者保存消息的函数，这些函数可以操纵使用 protobuf 的二进制格式定义好的类型：
+
+* `SerializeToString()`：将消息序列化成为一个字符串 `string`。注意序列化最终的结果其实是二进制的字节串，我们仅仅使用 `str` 作为一个合适的包装而已。
+* `ParseFromString(data)`：将一个给定的字符串转化成为消息。
+
+
+
 
 
