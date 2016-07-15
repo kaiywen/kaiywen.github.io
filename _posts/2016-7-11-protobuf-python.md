@@ -79,7 +79,7 @@ message AddressBook {
 * `optional`：该字段可以设置或者不设置值。如果没有对 `optional` 的字段设置值，那么它将自动拥有一个默认的值。对于简单的类型，你可以自行指定默认值，例如上述代码中 `PhoneNumber` 中的 `PhoneType`。如果为未自行指定默认值，系统将会为其设置默认值：数值类型将被设置成为 0，字符串类型被设置成空字符串，布尔类型被设置成为 `false`。对于嵌入的消息类型，其默认值总是它默认的实例或者原型。默认的实例中所有的字段都未设置值。当获取一个没有被显示设置值的 `optinal` 字段时总是会返回这个字段的默认值。
 * `repeated`：这种字段可以将值重复设置并连接起来，并且这些值在 protobuf 中的顺序将会得以保存。你可以将 `repeated` 字段看成是一种具有动态容量的数组。
 
-<p class="caution">Required 字段注意事项：你应该非常谨慎的将字段定义为 required. 如果在后续的某个时刻，你不想再使用一个 required 字段，那么直接将其改为 optional 将会引起问题 -- 旧的协议读取代码将会认为不带有该字段的消息是不完全的并且将会拒绝或者无意地丢弃它们。事实上，你应该为你的 buffers 编写一些应用相关的定制的验证规则。Google 的一些工程师甚至认为使用 required 字段弊大于利，他们倾向于仅仅使用 optional 和 repeated 字段。然而，这种说法并没有达成普遍共识。</p>
+<p class="caution"><strong>Required 字段注意事项</strong>：你应该非常谨慎的将字段定义为 <code>required</code>. 如果在后续的某个时刻，你不想再使用一个 <code>required</code> 字段，那么直接将其改为 <code>optional</code> 将会引起问题 -- 旧的协议读取代码将会认为不带有该字段的消息是不完全的并且将会拒绝或者无意地丢弃它们。事实上，你应该为你的 buffers 编写一些应用相关的定制的验证规则。Google 的一些工程师甚至认为使用 <code>required</code> 字段弊大于利，他们倾向于仅仅使用 <code>optional</code> 和 <code>repeated</code> 字段。然而，这种说法并没有达成普遍共识。</p>
 
 在教程 [Protocol Buffer Language Guide](https://developers.google.com/protocol-buffers/docs/proto)里，你将可以学到所有有关 `.proto` 文件的写法。不要尝试着去寻找类继承之类的语法，protobuf 不支持那一套。
 
@@ -157,6 +157,131 @@ person.id = "1234"        # raises TypeError
 
 * `SerializeToString()`：将消息序列化成为一个字符串 `string`。注意序列化最终的结果其实是二进制的字节串，我们仅仅使用 `str` 作为一个合适的包装而已。
 * `ParseFromString(data)`：将一个给定的字符串转化成为消息。
+
+针对解码和序列化这两个函数有一系列的参数，你可以查看 [Message API Reference](https://developers.google.com/protocol-buffers/docs/reference/python/google.protobuf.message.Message-class) 获取详细信息。
+
+<p class="caution"> <strong> Protobuf 和 面向对象设计：</strong> 需要注意 protobuf 生成的消息类仅仅作为一种数据的包装（类似于 C++ 语言中的 struct）；他们在对象模型中并不算做一等公民。如果你想要让产生的消息类具有更多的行为，最好的方式就是将他们包装在一个应用相关的类中。当你不能控制<code> .proto </code>文件的构建时（例如你复用了别人的工程代码），自行包装一个生成的消息类是一个非常不错的办法。这允许你隐藏一些数据和方法并暴露出一些更加易用的函数接口。<strong>你绝对不能通过继承生成的消息类来为他们扩展更多的行为。</strong>这种做法将会破坏内部机制并且不是一个好的面向对象的做法。</p>
+
+## 编写一个消息
+
+现在你可以尝试使用已经生成的消息类。首先最想要完成的第一个动作就是陷入个人信息到你的地址簿中。为了达到目的，你可以创建并且持有你的 protobuf 消息类的实例，并且将他们写入到一个输出管道中（可以是文件或者网络）。
+
+下面是一个从文件中读取 `AddressBook` 的例子，它基于用户的输入创建一个新的 `Person` 对象，并且将新的 `AddressBook` 实例写回到文件中。
+
+```python
+#! /usr/bin/python
+
+import addressbook_pb2
+import sys
+
+# This function fills in a Person message based on user input.
+def PromptForAddress(person):
+  person.id = int(raw_input("Enter person ID number: "))
+  person.name = raw_input("Enter name: ")
+
+  email = raw_input("Enter email address (blank for none): ")
+  if email != "":
+    person.email = email
+
+  while True:
+    number = raw_input("Enter a phone number (or leave blank to finish): ")
+    if number == "":
+      break
+
+    phone_number = person.phone.add()
+    phone_number.number = number
+
+    type = raw_input("Is this a mobile, home, or work phone? ")
+    if type == "mobile":
+      phone_number.type = addressbook_pb2.Person.MOBILE
+    elif type == "home":
+      phone_number.type = addressbook_pb2.Person.HOME
+    elif type == "work":
+      phone_number.type = addressbook_pb2.Person.WORK
+    else:
+      print "Unknown phone type; leaving as default value."
+
+# Main procedure:  Reads the entire address book from a file,
+#   adds one person based on user input, then writes it back out to the same
+#   file.
+if len(sys.argv) != 2:
+  print "Usage:", sys.argv[0], "ADDRESS_BOOK_FILE"
+  sys.exit(-1)
+
+address_book = addressbook_pb2.AddressBook()
+
+# Read the existing address book.
+try:
+  f = open(sys.argv[1], "rb")
+  address_book.ParseFromString(f.read())
+  f.close()
+except IOError:
+  print sys.argv[1] + ": Could not open file.  Creating a new one."
+
+# Add an address.
+PromptForAddress(address_book.person.add())
+
+# Write the new address book back to disk.
+f = open(sys.argv[1], "wb")
+f.write(address_book.SerializeToString())
+f.close()
+```
+
+## 读取一个消息
+
+当然，如果你不能从地址簿中读取消息，那么你的地址簿也并没有什么X用。下面的例子展示了如何从上述代码创建的文件中读取信息并且打印：
+
+```python
+#! /usr/bin/python
+
+import addressbook_pb2
+import sys
+
+# Iterates though all people in the AddressBook and prints info about them.
+def ListPeople(address_book):
+  for person in address_book.person:
+    print "Person ID:", person.id
+    print "  Name:", person.name
+    if person.HasField('email'):
+      print "  E-mail address:", person.email
+
+    for phone_number in person.phone:
+      if phone_number.type == addressbook_pb2.Person.MOBILE:
+        print "  Mobile phone #: ",
+      elif phone_number.type == addressbook_pb2.Person.HOME:
+        print "  Home phone #: ",
+      elif phone_number.type == addressbook_pb2.Person.WORK:
+        print "  Work phone #: ",
+      print phone_number.number
+
+# Main procedure:  Reads the entire address book from a file and prints all
+#   the information inside.
+if len(sys.argv) != 2:
+  print "Usage:", sys.argv[0], "ADDRESS_BOOK_FILE"
+  sys.exit(-1)
+
+address_book = addressbook_pb2.AddressBook()
+
+# Read the existing address book.
+f = open(sys.argv[1], "rb")
+address_book.ParseFromString(f.read())
+f.close()
+
+ListPeople(address_book)
+```
+
+## 扩展 protobuf
+
+在你以后的代码中，你肯定想要扩展你的 protobuf 的定义。如果你想要让你新定义的 protobuf 能够后向兼容，并且让你的旧定义前向兼容，你需要注意一些事项。在你新版本的 protobuf 定义中：
+
+* 你绝对不能改变任何一个已经存在的字段的标签号。
+* 你绝对不能删除或者添加任何 `required` 字段。
+* 你可以删除 `optional` 或者 `repeated` 字段。
+* 你可以添加新的 `optional` 或 `repeated` 字段，但是必须分配给他们新的标签号。（『新标签号』指的是从来没有用过的标签号，即使是已经删除的字段的标签号也不能重复使用）。
+
+（尽管上述的规则有一些[例外](https://developers.google.com/protocol-buffers/docs/proto.html#updating)，但是这些例外基本可以忽略）
+
+如果你遵循这些规则，你的旧代码将可以读取你的新消息并忽略掉新定义的字段。对于旧的代码来说，那些已经删除的 `optional` 字段将简单地被设为他们的默认值，那些删除的 `repeated` 字段将会成为空值。新的代码也能够无缝的读取旧的消息。然而，需要记住的是新的 `optional` 字段将不会出现在旧的消息当值，因此你要么使用 `has_` 方法显示的检查是否有该字段，要么在你的 `.proto` 文件中为其设置默认值。如果新的 `optional` 字段并没有被指定默认值，那么默认值将被自动设定。注意如果你添加了一个新的 `repeated` 字段，你的代码可能不能分辨出该字段是被设置为空（新代码）还是重来都没有设置过（旧代码）。
 
 
 
