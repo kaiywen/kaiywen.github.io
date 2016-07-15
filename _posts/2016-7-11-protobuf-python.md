@@ -17,7 +17,7 @@ tags:
 这篇文章为 Python 编程者提供了一个使用 protobuf 的基本教程。下文通过创建一个简单的应用，向你展示了三点主要内容：
 
 * 怎样在一个 `.proto` 文件中定义消息（Message）格式
-* 怎样使用 protobuf 的的编译器
+* 怎样使用 protobuf 编译器
 * 怎样利用 protobuf 的 API 来读写消息
 
 这并不是一个在 Python 中使用 protobuf 的完整的教程。如果你需要更加详细的信息，可以查看  [Protocol Buffer Language Guide](https://developers.google.com/protocol-buffers/docs/proto)，[Python API Reference](https://developers.google.com/protocol-buffers/docs/reference/python/index.html)，[Python Generated Code Guide](https://developers.google.com/protocol-buffers/docs/reference/python-generated) 以及 [Encoding Reference](https://developers.google.com/protocol-buffers/docs/encoding)。
