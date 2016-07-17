@@ -6,7 +6,7 @@ date:       2014-3-7 20:30:00
 author:     "YuanBao"
 header-img: "img/post-bg-2015.jpg"
 header-mask: 0.3
-catalog: true
+catalog: false
 tags:
  - life
  - poem
@@ -35,3 +35,5 @@ and sit at the gate of the temple and take alms of those
 who work with joy.
 
 -- The Prophet
+
+
