@@ -1,10 +1,10 @@
 ---
 layout:     post
-title:      "使用『dlsym』Hook系统函数"
+title:      "动态链接之 Hook 系统函数"
 subtitle:   ""
 date:       2017-5-3 16:10:00
 author:     "YuanBao"
-header-img: "img/post-bg-re-vs-ng2.jpg"
+header-img: "img/many-books.jpg"
 header-mask: 0.35
 catalog: true
 tags:
