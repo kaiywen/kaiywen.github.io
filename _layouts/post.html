@@ -260,7 +260,7 @@ layout: default
 </style>
 {% endif %}
 
-<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+<script type="text/javascript" src="https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -272,12 +272,8 @@ MathJax.Hub.Config({
         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
         TeX: { equationNumbers: { autoNumber: "AMS" },
         extensions: ["AMSmath.js", "AMSsymbols.js"] }
-      }});
+      }
+  });
 
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
+
 </script>
