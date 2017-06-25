@@ -148,7 +148,7 @@ int TcpStreamBuf::overflow(int c) {
  * `sungetc`: 将缓冲区的 `gptr()` 指针向前移动一个位置；
  * `sputbackc`: 将一个读取到的字符重新放回到输入缓冲区中；
 
-与输出缓冲区不同的是，输入缓冲区需要额外提供 `putback` 操作，也就是将字符放回到输入缓冲区内。我们的 TcpStream 暂时不需要支持该功能。
+与输出缓冲区不同的是，输入缓冲区需要额外提供 `putback` 操作，也就是将字符放回到输入缓冲区内。我们的 TcpStream 暂时不需要支持该功能，如果想了解如何添加 `pytback` 功能可以参考一下[这里](http://wizmann.tk/phxrpc-1.html)。
 
 当输入缓冲区满足 `gptr() == egptr()` 时，表明缓冲区已经没有数据可以读取，函数 `sgetc` 将会调用 underflow 函数来从外部设备中拉取数据。不同于 `sgetc`，`sbumpc` 在这种情况下则会调用 `uflow` 来实现拉取数据，并移动缓冲区读取指针的目的。默认情况下，`uflow` 会调用 `underflow`，我们也无需额外实现 `uflow`，但在特殊情况下（例如没有定义缓冲空间），则需要覆盖实现两个函数。
 
