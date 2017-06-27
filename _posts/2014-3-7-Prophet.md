@@ -29,6 +29,8 @@ to yourself, and to one another, and to God...
 
 Work is love made visible.
 
+<!--more-->
+
 And if you cannot work with love but only with distances,
 it is better that you should leave your work
 and sit at the gate of the temple and take alms of those

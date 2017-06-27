@@ -15,6 +15,8 @@ tags:
 
 在一个网络中，一个Community Structure代表图中的某些节点的集合。这些节点内部具有高度的耦合性（表现在内部的连通性非常高，内部节点之间的边非常丰富），同时与外界的其他节点保持着较为稀疏的连接。在一个Community Structure内部，节点之间的紧密连接使得信息的传输速度非常快。同时，Community Structure的存在也使得网络具有天然可被分割的性质。
 
+<!--more-->
+
 Community Structure在真实的网络中应用非常广泛。在Social network中，基于社群结构的分析能够提高好友推荐，信息传播，广告定位的精确性；在Citation network中，图的社群特性能够精确的区分不同的research topic；在代谢网络中，不同节点的生物功能也能够通过社群结构的特性反应出来。甚至于在生物的大脑中，都展现出了高度的Community Sturcture。由于Community Structure特性在各个领域广泛的应用，如何将图分解为合适的Communities得到了许多学者大量的探索和研究。本文将要介绍这些方法中最为高效的一种：Louvain Method （查了一下，Louvain是比利时的一个城市，当时这篇文章的作者都在Louvain的时候提出了这个方法，因此该算法一直被称为Louvain Method或者Louvain Clustering）。之所以说Louvain Method高效，是因为在作者当时的环境下，“分析出一个具有一亿一千八百万规模的网络的社群结构只需要152分钟”。
 
 事实上，Louvain Method是一种基于图的Modularity的算法。因此我将有关Louvain Method的介绍分为两个部分。本文作为上半部分首先具体介绍一下什么是图的Modularity。

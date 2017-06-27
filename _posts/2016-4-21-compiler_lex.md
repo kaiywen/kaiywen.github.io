@@ -19,13 +19,15 @@ tags:
 
 尽管在任何一门有关编译原理的课程上都会提到编译和解释的概念，但是不是每个人都能清楚地说明这两者之间的区别。下图从用户的角度给出了编译器和解释器处理用户程序的基本过程。
 
-![Compiler vs Interpretor](/img/compiler_vs.png){: width="360px" height="260px" }
+![Compiler vs Interpretor](/img/compiler_vs.png){: width="360px" height="240px" }
 <small class="img-hint">图1：Compiler vs Interpretor</small>
 
 * **编译器**读取用户使用某种语言编写的<font color="#ff3385"> 源程序 </font>，并把改程序翻译成为一个等价的，用另一种语言编写的<font color="#ff3385"> 目标程序 </font>，用户可以给定数据，并调用目标程序产生输出。
 * **解释器**并不通过翻译的方式生成目标程序。从用户的角度来看，解释器直接利用用户提供的输入来执行源程序文件中指定的操作。
 
 按照上面的定义，我们通常所用的 Python 是一种解释性语言，但事实上 Python 兼具了编译和解释的过程。一个 Python 程序首先被编译成为 Python 字节码，然后通过 Python 虚拟机解释执行。
+
+<!--more-->
 
 ## 编译的过程
 

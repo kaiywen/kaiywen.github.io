@@ -25,6 +25,8 @@ tags:
 * [FireFly](http://firefly.9miao.com)
 * [Awesome-python](https://github.com/jobbole/awesome-python-cn)
 
+<!--more-->
+
 ## 游戏开发
 * [OpenGL Tutorial](https://www.learnopengl.com)
 * [~~Learning Unity3D~~](https://unity3d.com/cn/learn)
