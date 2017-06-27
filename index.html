@@ -19,6 +19,11 @@ description: "Kaiyuan Blog"
         <p class="post-meta">
             Posted by {% if post.author %}{{ post.author }}{% else %}{{ site.title }}{% endif %} on {{ post.date | date: "%B %-d, %Y" }}
         </p>
+        <span class="post-tags">
+        {% for tag in post.tags %}
+            <a class="post-view-tags" href="/tags/#{{tag}}">{{tag}}</a>
+        {% endfor %}
+        </span>
         <div class="post-content-preview md"> 
             {{ post.excerpt }}  
         </div>
