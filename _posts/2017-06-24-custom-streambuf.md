@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "C++ 之定制streambuf"
+title:      "定制你的 C++ 输入输出流"
 subtitle:   ""
 date:       2017-6-22 10:21:00
 author:     "YuanBao"

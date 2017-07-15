@@ -39,26 +39,37 @@ font-size: 16px;
 font-style: italic;
 margin-top: 0
 }
+
+.post-preview .post-meta:before {
+content: "\f073";
+color: gray;
+font: 16px FontAwesome;
+margin-right: 5px;
+}
 .post-preview-hr {
 margin-top: 100px;
 margin-bottom: 40px;
 }
 .cont-read-btn.pull-right {
     margin-top: 10px;
-    border-right: 1px solid #4D85D1;
+    border: 1px solid #4D85D1;
     border-bottom: 1px solid #4D85D1;
     position: relative;
     color: #4D85D1;
     transition: all 0.15s;
     padding: 0.3em 1em;
-    font-size: 14px;
+    font-size: 12px;
+    -webkit-border-radius: 2px;
+-moz-border-radius: 2px;
+border-radius: 2px;
 }
 .cont-read-btn.pull-right:hover {
 color: white;
 transition: all 0.15s;
 padding: 0.3em 1em;
-font-size: 14px;
-background: #4D85D1
+font-size: 12px;
+background: #4D85D1;
+transform: scale(1.06);
 }
 .post-subtitle {
     font-size:20px;
@@ -68,6 +79,13 @@ p.post-meta {
 }
 .post-content-all .post-tags {
     margin-left:30px;
+}
+
+.post-content-all .post-tags:before {
+content: "\f02b";
+color: gray;
+font: 16px FontAwesome;
+margin-right: 5px;
 }
 
 .post-view-tags::before {
@@ -90,12 +108,11 @@ transition: transform 0.15s ease-in-out;
 -ms-transition: transform 0.15s ease-in-out;
 }
 
-a.post-view-tags {
+.post-view-tags {
 display: inline-block;
 border: 1px solid #0085a1;
 padding: 0 10px;
 color: #0085a1;
-line-height: 24px;
 font-size: 12px;
 text-decoration: none;
 margin: 0 1px;
@@ -108,7 +125,11 @@ transition: color 0.3s;
 -moz-transition: color 0.3s;
 -o-transition: color 0.3s;
 -ms-transition: color 0.3s;
+-webkit-border-radius: 2px;
+-moz-border-radius: 2px;
+border-radius: 2px;
 }
+
 .post-view-tags:hover, .post-view-tags:focus, .post-view-tags:active {
     color: white;
     text-decoration: none;
@@ -117,6 +138,6 @@ transition: color 0.3s;
     -webkit-transform: scaleX(1);
     transform: scaleX(1);
 }
-.sidebar-container .post-view-tags{color:#0085a1!important}
+.sidebar-container .post-view-tags{line-height: 24px; color:#0085a1!important}
 .sidebar-container .post-view-tags:hover,.sidebar-container .post-view-tags:active{color:white!important}
 
