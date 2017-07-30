@@ -122,14 +122,14 @@ td.gutter.gl {
 .highlight td.code pre {
   padding-left: 20px;
   border:none;
-  border-bottom-right-radius: 3px;
-  border-top-right-radius: 3px;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .highlight pre.lineno {
   border:none;
-  border-bottom-left-radius: 3px;
-  border-top-left-radius: 3px;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
   -webkit-user-select:none;
   -moz-user-select:none;
   -ms-user-select:none;
