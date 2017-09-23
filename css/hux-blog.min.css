@@ -75,7 +75,8 @@ transform: scale(1.06);
     font-size:20px;
 }
 p.post-meta {
-    float: left;  
+    float: left;
+    margin: 0;
 }
 .post-content-all .post-tags {
     margin-left:30px;
