@@ -7,3 +7,6 @@ npm-debug.log
 *.sh
 browse.VC.db
 Gemfile.lock
+.bundle/config
+.python-version
+.ruby-version
