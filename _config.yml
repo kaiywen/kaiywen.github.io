@@ -59,6 +59,10 @@ kramdown:
     block:
       line_numbers: true
       start_line: 1
+    table_class: 'table'
+    gutter_class: 'gutter'
+    code_class: 'code'
+
 
 
 

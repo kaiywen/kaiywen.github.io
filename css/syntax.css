@@ -195,7 +195,6 @@ td.gutter.gl {
 }
 
 .codehilite pre.lineno {
-  border:none;
   border-bottom-left-radius: 3px;
   border-top-left-radius: 3px;
   border: 1px solid #ccc;
@@ -203,6 +202,7 @@ td.gutter.gl {
   -moz-user-select:none;
   -ms-user-select:none;
   user-select:none;
+  text-align: right;
 }
 
 div.highlighter-rouge {
@@ -210,7 +210,9 @@ div.highlighter-rouge {
   margin-bottom: 30px;
 }
 
-.codehilite .table>tbody>tr>td .gutter gl {
-  padding-left: 1px;
+pre.codehilite {
+  padding: 0;
+  border: none;
+  background-color: #fff;
 }
 
