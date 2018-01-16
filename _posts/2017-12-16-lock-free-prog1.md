@@ -150,7 +150,9 @@ CAS2 也就是双倍字长的 CAS 原语，在 32-bit 的机器上 CAS2 能够�
 在我的 64-bit 机器上，为了能够使用 CAS2，需要将指针 `pMap_` 与 `count` 变量存储在连续的 128-bit 空间内：
 
 ```c++
-#define MEM_ALIGNED __attribute__(( __aligned__(128) ))
+
+// Align memory to 128-bit
+#define MEM_ALIGNED __attribute__(( __aligned__(16) ))
 
 template <typename K, typename V>
 class LockFreeMap2 {
@@ -175,9 +177,13 @@ private:
 通过结构 `MapPointer`，我们可以同时操作 128-bit 的空间，因此 `LookUp` 的实现如下：
 
 ```c++
-#define CAS2(val, oldval, newval) \
-    __sync_bool_compare_and_swap((long long*)(val), \
-        (*(long long*)(oldval)), (*(long long*)(newval)))
+#ifndef uint128_t
+#define uint128_t __uint128_t
+#endif
+
+#define CAS2(val, oldval, newval) \ 
+    __sync_bool_compare_and_swap((uint128_t*)(val), \
+    (*(uint128_t*)(&oldval)), (*(uint128_t*)(&newval)))
     
 V LookUp(K &key) {
     MapPointer pOld, pNew;
