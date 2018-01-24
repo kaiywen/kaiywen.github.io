@@ -162,7 +162,7 @@ private:
         long count_;
 
         MapPointer() {
-            p_ = nullptr;
+            p_ = new std::map<K, V>();
             count_ = 0;
         };
     } MEM_ALIGNED;
@@ -192,7 +192,7 @@ V LookUp(K &key) {
         pNew = pOld;
         pNew.count_++;
     } while (!CAS2(&pMap_, pOld, pNew));
-    V temp = pNew.p_[key];
+    V temp = (*pNew.p_)[key];
     do {
         pOld = pMap_;
         pNew = pOld;
@@ -213,7 +213,7 @@ void Update(K &key, V& val) {
             delete pNew.p_;
         }
         pNew.p_ = new std::map<K, V>(*pOld.p_);
-        pNew.p_[key] = val;
+        (*pNew.p_)[key] = val;
     } while(!CAS2(&pMap_, pOld, pNew));
     delete pOld.p_;
 }
