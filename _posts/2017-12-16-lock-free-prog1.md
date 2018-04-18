@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Lock-free 编程：A case study（上）
+title:      Lock-free 编程：A Case Study（上）
 subtitle:   "基于 CAS 的无锁数据结构"
 date:       2017-12-14 15:56:00
 author:     "YuanBao"

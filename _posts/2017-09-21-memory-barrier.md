@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Memory reordering 浅析"
+title:      "Memory Reordering 浅析"
 subtitle:   ""
 date:       2017-9-22 22:49:00
 author:     "YuanBao"
@@ -34,7 +34,7 @@ tags:
 
 任何一个程序都需要经过编译才能运行到 CPU 上，而在编译和运行阶段都"可能"产生 Memory reordering。我们把编译阶段产生的乱序称为 Compiler Reordering（编译乱序），也即 Software memory reordering；把产生于运行阶段的乱序被称为 CPU memory reordering，也叫做 Hardware memory reordering。这一小节我们先来介绍编译乱序。
 
-<p class="caution"><strong>注意</strong>：很多不甚了解 Memory Reordering 的人可能会混淆这两个概念，或者认为它们等价。事实上，对于不同体系架构（eg. 单核，多核，Intel-arch 或 PowerPC），Compiler Reordering 与 CPU reordering 有相应的联系和区别。 </p>
+<p class="caution"><strong>注意</strong>：很多不甚了解 Memory Reordering 的人可能会混淆这两个概念，或者认为它们等价。事实上，对于不同体系架构（eg. 单核，多核，Intel-arch 或 ARM），Compiler Reordering 与 CPU reordering 有本质的区别。 </p>
 
 编译乱序很好理解，即在编译阶段，编译器为了优化程序的执行效率，自行地将内存操作指令重排，从而使得读写内存的指令与程序定义的操作顺序不一致。我们通过一个例子来证明 Compiler Reordering 的存在。对于如下简单的 c 程序：
 
@@ -97,15 +97,7 @@ int foo()
 
 #### CPU memory reordering
 
-介绍完编译乱序，接下来我们再来看一下运行时产生的乱序，即 CPU memory reordering，也被称为 Hardware memory reordering。相比于编译乱序而言，CPU 乱序的产生原因，产生背景以及对程序的影响都要更为复杂。其至少涉及到如下的相关内容：
-
-1. acquire-release semantics;
-2. Sequential consistency;
-3. Synchronize-with relation;
-4. Strongly- or Weakly-ordered memory;
-5. Cache coherence protocol
-
-当然，要完全把所有的东西都说明白可能需要一篇很长的文章，我们这里尽量先用简单的例子来证明 CPU memory reordering 的存在，然后介绍一下几种不同的 CPU reordering 的类型以及相应的 barrier。
+介绍完编译乱序，接下来我们再来看一下运行时产生的乱序，即 CPU memory reordering，也被称为 Hardware memory reordering。相比于编译乱序而言，CPU 乱序的产生背景以及对程序的影响都要更为复杂，其涉及到了 CPU 体系结构以及 cache coherence 协议。当然，要把所有的东西都说明白可能需要一篇很长的文章，这里我们尽量先用简单的例子来证明 CPU reordering 的存在，然后介绍一下几种不同的 CPU reordering 的类型以及相应的 barrier。关于 CPU reordering 的产生原因，后面再用一篇文章细细讲解。
 
 对于如下的两个程序 P1 和 P2，假设 X 和 Y 的值初始均为 1， 且 P1 和 P2 分别由两个线程运行在一个双核 CPU 上，我们的问题是：两个线程并行执行得到的 `r1` 以及 `r2` 的值会不会同时为 0 ？
 
@@ -117,7 +109,7 @@ int foo()
          P1                         P2
 ```
 
-大多数人可能都会认为 `r1` 和 `r2` 是不可能同时为 0 的。然而根据 [Intel Arch Specification](https://software.intel.com/en-us/articles/intel-sdm)，Intel CPU 的每个核是可以自由地重排其指令的执行顺序，从而导致两个核都可能先执行对于 `r1` 和 `r2` 的复制操作，从而导致最终得到  `r1` 以及 `r2` 均为 0。
+大多数人可能都会认为 `r1` 和 `r2` 是不可能同时为 0 的。然而根据 [Intel Arch Specification](https://software.intel.com/en-us/articles/intel-sdm)，Intel CPU 的核心是可以根据规则自由地重排指令的执行顺序，从而导致两个核都可能先执行对于 `r1` 和 `r2` 的复制操作，从而导致最终得到  `r1` 以及 `r2` 均为 0。
 
 如果你是一个主动思考的人，看到这里一定会有一个疑问：这种 CPU 产生的乱序难道没有违背先前所制定的产生 memory reordering 的前提吗？为了清楚地说明这个问题，我们再重申一下任何体系架构产生 memory reordering 的前提要求:
 
@@ -195,7 +187,7 @@ int main()
 
 #### CPU memory barrier
 
-CPU 对内存的操作共分两种，分别是 load 和 store，因此在理论上存在四种 CPU 内存乱序：Load-Load，Load-Store，Store-Store，Store-Load 乱序。这里用『理论上』三个字的原因是：在不同的硬件内存模型上，可能产生的内存乱序的种类并不相同。在 Strongly-ordered memory 环境例如 X86/X64 下，唯一允许产生的乱序是 Store-Load 乱序。（不妨回头去检查一下以上的程序实例是否是 Store-Load 乱序）。
+CPU 对内存的操作共分两种，分别是 load 和 store，因此在理论上存在四种 CPU 内存乱序：Load-Load，Load-Store，Store-Store，Store-Load 乱序（在 DEC Alpha 上会出现另一种 Dependent Loads 乱序，鉴于这种乱序在现代 CPU 体系结构不会出现，这里也不再过多强调）。我们用『理论上』三个字的原因是：在不同的硬件内存模型上，可能产生的内存乱序的种类并不相同。在 Strongly-ordered memory 环境例如 X86/X64 下，唯一允许产生的乱序是 Store-Load 乱序。（由 write buffer 的存在而产生）。
 
 针对四种不同的 CPU 内存乱序，也应该存在对应的四种 barrier。然而针对 Intel CPU 而言，我们主要讨论三种内存 Barrier：
 
@@ -229,17 +221,15 @@ __asm__ __volatile__("xchgl (%0),%0");
 
 ## 更多内容
 
-有关 memory reordering 的简介到这里就先结束了。这一块的内容想要用一篇文章说明白显然不太现实，关于前面提到的：
+有关 memory reordering 的简介到这里就先结束了。涉及到内存模型，还有非常多额外的内容，例如
 
+* Cache coherence protocol (eg. MSI, MESI)
 * acquire-release semantics
 * Sequential consistency
 * Synchronize-with relation
 * Strongly- or Weakly-ordered memory
-* Cache coherence protocol 
 
-等内容，留待后续介绍。
-
-回想一下，突然发现欠了好多东西没写。。。
+这其中的每一条都可以花一整篇文章来写，后续有时间，我们慢慢来完善这一块的内容。
 
 
 

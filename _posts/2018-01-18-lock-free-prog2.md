@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Lock-free 编程：A case study（下）
+title:      Lock-free 编程：A Case Study（下）
 subtitle:   "Hazard Pointer"
 date:       2018-02-07 15:38:21
 author:     "YuanBao"
@@ -107,7 +107,7 @@ static void release(HPNode* node) {
 
 到这儿为止，关于 HazPtr 应该如何在 Lock-free Map 发挥作用，已经逐渐清楚：读线程在读取 Map 之前，需要先调动 `require` 获取一个 HPNode，并将 Map 指针交由其管理，表明*『我正在读取 Map 里面的内容，请不要改动它，更不要删除它』*；读线程读取操作完毕之后，在调用 `release` 将该 HPNode 释放，表明*『我已经不需要使用 Map 了』*。
 
-我们将 Lock-free Map 的 `LookUp` 函数可以修改如下：(4-7 行的循环看起来可能会很奇怪，思考一下为什么用一段循环来设置 HPNode 的 pContent_ 指针)
+我们将 Lock-free Map 的 `LookUp` 函数可以修改如下：(4-7 行的 double check 看起来可能很奇怪，思考一下其中的原因)
 
 ```c++
 void LookUp(K key) {
@@ -191,7 +191,7 @@ static void scanAndReleaseHPList() {
 
 ## RCU  vs.  Hazard Pointer
 
-说到 Hazard Pointer，那么就不得不再提到 Read-Copy-Update (RCU)。RCU 与 HazPtr 都利用了 deferred processing 的思想来防止读写线程产生竞争。下面我们简单的说明什么是 RCU 以及 HazPtr 与 RCU 的区别。有关如何实现 userspace-RCU 的细节，我们留待以后详细介绍。
+说到 Hazard Pointer，那么就不得不再提到 Read-Copy-Update (RCU)。RCU 与 HazPtr 都利用了 deferred processing 的思想来防止读写线程产生竞争。下面我们简单的说明 HazPtr 与 RCU 的区别。有关如何实现 userspace-RCU 的细节，我们留待以后详细介绍。
 
 我们仍然假设一个读多写少的场景，其中读写线程需要执行如下操作：
 
@@ -253,14 +253,15 @@ void writer() {
 
 > It is really hard to deploy hazard pointers in your own data structure or algorithm, and even harder if you have to do it in someone else's data structure.
 
-RCU 本身的使用要比 HazPtr 要广泛很多，不论是 Linux 内核的 rcu 还是 userspace 的 librcu，都充分展现了 read-copy-update 思想所带来的威力。
+RCU 本身的使用要比 HazPtr 要广泛很多，不论是 Linux 内核的 rcu 还是 userspace 的 [liburcu](http://liburcu.org)，都充分展现了 read-copy-update 思想所带来的威力。
 
 ## 参考文献
 
-1. [Lock-Free Data Structures with Hazard Pointers](http://www.drdobbs.com/lock-free-data-structures-with-hazard-po/184401890)
-2. [Concurrency Freaks](http://concurrencyfreaks.blogspot.com/2016/08/hazard-pointers-vs-rcu.html)
-3. [P0461R1: Proposed RCU C++ API](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0461r1.pdf)
-4. [perfbook](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
+1. [Hazard pointers: safe memory reclamation for lock-free objects](https://ieeexplore.ieee.org/abstract/document/1291819/)
+2. [Lock-Free Data Structures with Hazard Pointers](http://www.drdobbs.com/lock-free-data-structures-with-hazard-po/184401890)
+3. [Concurrency Freaks](http://concurrencyfreaks.blogspot.com/2016/08/hazard-pointers-vs-rcu.html)
+4. [P0461R1: Proposed RCU C++ API](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0461r1.pdf)
+5. [perfbook](https://cdn.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
 
  
 
