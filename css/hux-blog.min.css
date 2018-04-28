@@ -142,3 +142,7 @@ border-radius: 2px;
 .sidebar-container .post-view-tags{line-height: 24px; color:#0085a1!important}
 .sidebar-container .post-view-tags:hover,.sidebar-container .post-view-tags:active{color:white!important}
 
+.post-heading .tags .tag {
+    color: #fff;
+}
+
