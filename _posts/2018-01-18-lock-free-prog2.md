@@ -240,7 +240,8 @@ void writer() {
         DataB* dataB = readNewConfigDataB();
         globalConfigDataA.store(dataA);
         globalConfigDataB.store(dataB);
-        rcu_retire(dataA, dataB);
+        rcu_retire(dataA, dataB);  // nonblocking-style
+        // or synchronized_rcu()   // blocking-style
     }
 }
 ```
