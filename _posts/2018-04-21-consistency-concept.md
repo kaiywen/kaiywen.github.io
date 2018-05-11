@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "分布式系统『一致性』"
+title:      "分布式系统一致性"
 subtitle:   "Linearizability vs. Sequential consistency"
 date:       2018-4-21 22:30:00
 author:     "YuanBao"
