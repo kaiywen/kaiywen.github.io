@@ -10,3 +10,4 @@ Gemfile.lock
 .bundle/config
 .python-version
 .ruby-version
+.jekyll*
