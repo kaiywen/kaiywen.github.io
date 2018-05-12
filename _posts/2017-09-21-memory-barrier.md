@@ -38,7 +38,7 @@ tags:
 
 编译乱序很好理解，即在编译阶段，编译器为了优化程序的执行效率，自行地将内存操作指令重排，从而使得读写内存的指令与程序定义的操作顺序不一致。我们通过一个例子来证明 Compiler Reordering 的存在。对于如下简单的 c 程序：
 
-```c++
+```cpp
 int a, b;
 int foo()
 {
@@ -50,7 +50,7 @@ int foo()
 
 在 CentOS 6 with gcc 4.4.7 环境下通过命令编译 `gcc -S -masm=intel foo.c` 得到汇编程序，打开 foo.s 查看汇编代码如下：
 
-```c++
+```cpp
 mov eax, DWORD PTR b[rip]
 add eax, 1
 mov DWORD PTR a[rip], eax    // --> store to a
@@ -61,7 +61,7 @@ mov DWORD PTR b[rip], 0      // --> store to b
 
 OK，接下来我们使用编译指令 `gcc -S -O2 -masm=intel foo.c` 重新编译 foo.c（注意在 intel 体系结构下，gcc 通过 `-O2` 的编译选项会生成乱序代码，而 clang 经过测试则不会），仔细观察这次生成的汇编代码：
 
-```c++
+```cpp
 mov eax, DWORD PTR b[rip]
 mov DWORD PTR b[rip], 0      // --> store to b
 add eax, 1
@@ -74,14 +74,14 @@ Compiler Reordering 是编译器为了提高程序的执行效率而故意产生
 
 对于 GCC 及 clang 编译器而言，我们可以使用如下指令来显示地阻止编译器产生乱序：
 
-```c++
+```cpp
 #define barrier() __asm__ __volatile__("":::"memory")  // linux
 #define barrier() _ReadWriteBarrier()                  // win
 ``` 
 
 **`barrier()` 指令指示编译器不要将该指令之前的 Load-store 操作移动到该指令之后执行**。我们修改上面的程序如下，并再次使用 `-O2` 选项来生成汇编代码。此时你会发现 gcc 将不会把变量 `b` 的 store 操作提前到变量 `a` 的 store 操作之前
 
-```c++
+```cpp
 int foo()
 {
     a = b + 1;
@@ -101,7 +101,7 @@ int foo()
 
 对于如下的两个程序 P1 和 P2，假设 X 和 Y 的值初始均为 1， 且 P1 和 P2 分别由两个线程运行在一个双核 CPU 上，我们的问题是：两个线程并行执行得到的 `r1` 以及 `r2` 的值会不会同时为 0 ？
 
-```c++
+```cpp
   |---------------|          |---------------|
   |1  mov [X], 1  |          |1  mov [Y], 1  |
   |2  mov r1, [Y] |          |2  mov r2, [X] |
@@ -121,7 +121,7 @@ int foo()
 
 程序的主体通过两个线程分别执行如下程序，也就是完整地实现了上述关于 X 和 Y 的伪代码：
 
-```c++
+```cpp
 void *thread1Func(void *param) {
     MersenneTwister random(1);
     for (;;) {
@@ -143,7 +143,7 @@ void *thread1Func(void *param) {
 
 然后主程序进行如下同步，其执行多次地循环来输出 `r1` 和 `r2` 的值，当检测到 `r1` 和 `r2` 均为 0 时，表明上述的 CPU reordering 产生了：
 
-```c++
+```cpp
 int main()
 {
     sem_init(&beginSema1, 0, 0);
@@ -197,7 +197,7 @@ CPU 对内存的操作共分两种，分别是 load 和 store，因此在理论�
 
 我们可以通过 CPU 提供的如下的指令来显示的达到 Barrier 的目的：
 
-```c++
+```cpp
 #define LOAD_BARRIER() __asm__ __volatile__("lfence")
 #define STORE_BARRIER() __asm__ __volatile__("sfence")
 #define FULL_BARRIER() __asm__ __volatile__("mfence")
@@ -205,7 +205,7 @@ CPU 对内存的操作共分两种，分别是 load 和 store，因此在理论�
 
 同时，任何带有 `lock` 操作的指令以及某些原子操作指令均可以当做隐式的 Barrier，例如：
 
-```c++
+```cpp
 __asm__ __volatile__("lock; addl $0,0(%%esp)");
 
 __asm__ __volatile__("xchgl (%0),%0");
@@ -213,7 +213,7 @@ __asm__ __volatile__("xchgl (%0),%0");
 
 我们也可以将 Compiler Barrier 和 CPU Barrier 通过一条指令来实现：
 
-```c++
+```cpp
 #define ONE_BARRIER() __asm__ __volatile__("mfence":::"memory")
 ```
 

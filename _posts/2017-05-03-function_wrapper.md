@@ -82,7 +82,7 @@ void* malloc(size_t sz) {
 
 上面 line 7 中出现的宏 `RTLD_NEXT` 的含义是告诉链接器，将 `malloc` 这个符号的定义解析到后面的可执行目标文件或者共享库中，而不要解析为本模块中的定义。接下来我们可以将 dlsym_test_preload.c 编译成为动态链接库，由于我在 Mac 下操作，因此我的编译结果如下：
 
-```shell
+```bash
 > clang -o dlsym_test.dylib -shared -fPIC -o2 dlsym_test_preload.c
 ```
 
@@ -92,7 +92,7 @@ void* malloc(size_t sz) {
 
 当然，尽管 MacOS 的编译链接系统与 Linux 不同，但我们仍然可以通过相似的原理来实现操纵其动态链接库的目的。对于 MacOS 下的程序我们可以通过修改参数 `DYLD_INSERT_LIBRARIES` 来达到提前载入指定共享库的目的。然而，通过 `man dyld` 可以知道，`DYLD_INSERT_LIBRARIES` 对于 [two-level namespace images](https://developer.apple.com/library/content/documentation/DeveloperTools/Conceptual/MachOTopics/1-Articles/executing_files.html) 没有影响，因此在 Mac 下我们需要通过如下的参数编译程序才能达到目的：
 
-```shell
+```bash
 > clang -o main -force_flat_namespace main.c
 > DYLD_INSERT_LIBRARIES=dlsym_test.dylib ./main
 > my malloc invoked

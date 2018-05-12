@@ -49,7 +49,7 @@ while(tcpInOut1 >> inputStr) {
 
 `streambuf` 是一个 [traits class](http://jjhou.boolan.com/programmer-6-type-traits-ddj.htm)，由 `basic_streambuf` 所定义（具体什么是 traits class 以及为什么要这么定义 `streambuf`，以后再说）。
 
-```c++
+```cpp
 template< 
     class CharT, 
     class Traits = std::char_traits<CharT>
@@ -68,7 +68,7 @@ streambuf 使用三个指针来管理相应的输出缓冲区（缓冲区需要�
 
 streambuf 定义的输出相关的函数主要有 `sputc` 和 `sputn`，前者输出一个字符到缓冲区，并且将指针 `pptr` 向后移动一个字符，后者调用函数 `xsputn` 连续输出多个字符，`xsputn` 默认的实现就是多次调用 `sputc`。由于缓冲区有限，当 `pptr` 指针向后移动满足 `pptr() == epptr` 时，说明缓冲区满了，这时将会调用函数 `overflow` 将数据写入到外部设备并清空缓冲区；清空缓冲区的方式则是调用 `pbump` 函数将指针 `pptr` 重置。我们可以通过如下的类来实现自定义的输出 buffer：
 
-```c++
+```cpp
 #include <iostream>
 
 class TcpStreamBuf : public std::streambuf {
@@ -88,7 +88,7 @@ class TcpStreamBuf : public std::streambuf {
 
 我们在初始化时来申请 buffer 内存，并且通过 `setp` 函数来指定初始 `pbase` 以及 `epptr` 指针的位置：
 
-```c++
+```cpp
 TcpStreamBuf::TcpStreamBuf(int socket, size_t buf_size) :
     buf_size_(buf_size), socket_(socket) {
     assert(buf_size_ > 0);
@@ -117,7 +117,7 @@ int TcpStreamBuf::sync() {
 
 上面的构造函数和 sync 函数都比较容易理解。构造函数申请一块堆内存 `pbuf` 作为输出缓冲区，然后调用 `setp` 函数来设置 buffer 的头指针 `pbase` 和尾指针 `epptr`。`sync` 函数强制将已经缓存的数据调用 send 发送出去，也就是刷新到外部设备。接下来我们看如何定义函数 `overflow`。由于调用 overflow 时当前的缓冲区已经满了，因此 overflow 的参数 c 必须在缓冲区中的数据刷新到外部设备之后才能够放入到 buffer 中，否则 overflow 应该返回 eof。
 
-```c++
+```cpp
 int TcpStreamBuf::overflow(int c) {
     if (-1 == sync()) {
         return traits_type::eof();
@@ -156,7 +156,7 @@ int TcpStreamBuf::overflow(int c) {
 
 知道这些之后，我们就可以为 TcpStreamBuf 增加输入的功能。首先我们需要在构造时，为 TcpStreamBuf 申请一块空间用于输出缓冲区，并调用 `setg` 来设置相应的三个指针:
 
-```c++
+```cpp
 gbuf_ = new char[buf_size_];
 setg(gbuf_, gbuf_, gbuf_);
 ```
@@ -182,7 +182,7 @@ int TcpStreamBuf::underflow() {
 
 自定义的类 `BasicTcpStream` 需要继承于类 `iostream`，并且将 `TcpStreamBuf` 作为底层的缓冲区使用：
 
-```c++
+```cpp
 class BasicTcpStream : public std::iostream {
 public:
     BasicTcpStream(int socket, size_t buf_size): 
@@ -198,7 +198,7 @@ private:
 ```
 我们决定不再为这个类增加更多的内容，仅仅将其作为一个简单的包装类来测试一下 TcpStreamBuf 的使用。我们首先需要编写一个简单的 client 和 server 来建立起 tcp 链接，然后通过类似于标准输入输出的方式来实现对于 socket 的写入和读取，其中 server.c 的写入代码如下：
 
-```c++
+```cpp
 for (;;) {
     int clientfd = -1;
     struct sockaddr_in addr;
@@ -224,7 +224,7 @@ for (;;) {
 
 对于每一个接入的客户端，首先写回一个 HelloWorld，然后从字母 `j` 到字母 `q` 逐个写入，之后接受从客户端发过来的字符。客户端的代码如下：
 
-```c++
+```cpp
 tcpstream::BasicTcpStream tcpInOut(sockfd, BUF_SIZE);
 char line[64] = { 0 };
 

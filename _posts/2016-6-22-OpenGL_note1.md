@@ -86,7 +86,7 @@ CMake 是一个可以生成项目或者解决方案的工具，它以使用CMake
 
 使用同样的方法，我们可以配置编译安装其他的几个库，并且按照相同的方式将库文件添加到工程 Build Phases中的 Link Binary With Libraries，之后我们可以通过下面的代码简单判断一下我们的环境配置是否成功：
 
-~~~c++
+```c
 // GLEW
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -103,7 +103,7 @@ int main()
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     return 0;
 }
-~~~
+```
 
 如果编译成功，那么你的 OpenGL 的环境基本就配置好了，接下来就可以开始我们的 OpenGL 旅程了。
 

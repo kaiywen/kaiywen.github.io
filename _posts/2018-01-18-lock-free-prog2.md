@@ -35,7 +35,7 @@ tags:
 
 我们已经了解了，读线程在读取 `pMap` 的内容之前，需要先获取一个 Hazard Pointer（HazPtr），并且将 pMap 赋值给这个 Hazard Pointer。这样写线程在删除的时候就能检测到当前的 `pMap` 是否在被某个读线程使用。因此，我们可以简单地将 Hazard Pointer 定义为如下结构：
 
-```c++
+```cpp
 struct HPNode {
     std::atomic<void*> pContent_;
     bool active_;
@@ -47,7 +47,7 @@ struct HPNode {
 
 我们通过 `HPList` 来管理所有的 `HPNode`：
 
-```c++
+```cpp
 class HPList {
 private:
     HPNode* head_;
@@ -67,7 +67,7 @@ public:
 
 这里为了简单，我们可以将 HPList 设置成为单例，即所有的读写进程都从这个 HPList 中申请以及归还 Hazard Pointer。在生产环境中，可以通过不同的 HPList 来将线程分成不同的 domain 进行管理. HPList 主要提供两个函数 `require` 和 `release`. 我们首先来看一下 `require` 函数需要做哪些事情：
 
-```c++
+```cpp
 HPNode* require() {
     // 1. 先从已有的 HPNode 中寻找是否有空闲的节点
     auto p = head_;
@@ -96,7 +96,7 @@ HPNode* require() {
 
 相比于 `require` 操作， `release` 函数非常简单:
 
-```c++
+```cpp
 static void release(HPNode* node) {
     node->active_ = false;
     (node->pContent_).store(nullptr, std::memory_order_release);
@@ -109,7 +109,7 @@ static void release(HPNode* node) {
 
 我们将 Lock-free Map 的 `LookUp` 函数可以修改如下：(4-7 行的 double check 看起来可能很奇怪，思考一下其中的原因)
 
-```c++
+```cpp
 void LookUp(K key) {
     auto pHPNode = (HPList::instance()).require(); // 获取 HPNode
     Mapping_t pRead;
@@ -125,7 +125,7 @@ void LookUp(K key) {
 
 读线程在读取 Map 的过程中，相应的指针将交由 HazPtr 管理，那么写线程如何知道当前的 Map 指针正在被读线程读取呢？很简单，写线程在释放旧的 Map 指针时，先去 HPList 中循环查找一遍，检查当前需要释放的 Map 指针是否被某个 HazPtr 持有。如果没有任何 HPNode 持有 Map 指针，表明当前的 Map 未被任何其他的读线程使用，可以安全地释放。因此，写线程需要释放某个旧的 Map 指针时，可以调用函数 `retire` 完成上述功能。
 
-```c++
+```cpp
 void Update(K key, V val) {
     Mapping_t pNewMap = nullptr;
     Mapping_t pOldMap = nullptr;
@@ -143,7 +143,7 @@ void Update(K key, V val) {
 
 `retire` 函数来决定何时应该删除 `pOldMap` 指向的内存空间。因此 `retire` 函数需要扫描 `HPList`，确定当前的 `pOldMap` 不被任何读线程持有，并安全地将其删除。为了减少 `Update` 的调用时间，写线程不必在每次调用 `retire` 时均触发扫描 `HPList`；其可以先将 `pOldMap` 指针加入到一个私有的列表中，待列表超过一个长度时，一并将无用的指针空间释放掉： 
 
-```c++
+```cpp
 thread_local std::vector<void*> retireSet;  // 使用 TLS 管理需要释放的指针
 
 static void retire(void* pOld) {
@@ -156,7 +156,7 @@ static void retire(void* pOld) {
 
 每个写线程维持一个 thread-local 列表 `retireSet`，用来记录**当前哪些 Map 指针已经可以被释放，但是由于不确定是否还在被某个读线程使用，因此不能立即删除**。当 `retireSet` 的长度超过某个指定值时，触发函数 `scanAndReleaseHPList` 来扫描 `HPList`，确认哪些 Map 指针可以真正删除。`scanAndReleaseHPList` 的功能也就是求出 `retireSet` 与 `HPList` 的差集，并释放差集中的指针指向的空间：
 
-```c++
+```cpp
 static void scanAndReleaseHPList() {
     std::unordered_set<void*> hashSet;
     auto p = (HPList::instance()).head();
@@ -195,7 +195,7 @@ static void scanAndReleaseHPList() {
 
 我们仍然假设一个读多写少的场景，其中读写线程需要执行如下操作：
 
-```c++
+```cpp
 void doSomething(DataA*, DataB*);
 std::atomic<ConfigData*> globalConfigData;
 
@@ -222,7 +222,7 @@ void writer() {
 
 如果采用前文中 HazPtr 的技术，读线程需要同时为 dataA 和 dataB 都申请一个 HazPtr 来保护他们不被写线程所干扰，使用起来比较繁琐。因此，对于这种需要同时处理多块数据的场景，可以使用 RCU 来达到相同的目的。我们将读写函数使用 RCU 改造如下：
 
-```c++
+```cpp
 void reader() {
     while (true) {
         rcu_reader guard;  // RAII-style rcu guard

@@ -42,26 +42,28 @@ timezone: CN
 # although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
 # document: http://jekyllrb.com/docs/configuration/#kramdown
 excerpt_separator: "<!--more-->"
-highlighter: rouge
+highlighter: none # rouge
 markdown: kramdown
 kramdown:
-  input: GFM                            # use Github Flavored Markdown !important
-  syntax_highlighter: rouge
+  input: GFM 
+  #syntax_highlighter: prism #rouge
   math-engine:
 
   # Rouge Highlighter in Kramdown › http://kramdown.gettalong.org/syntax_highlighter/rouge.html
   # span, block element options fall back to global
   syntax_highlighter_opts:
+    disable: true
     # Rouge Options › https://github.com/jneen/rouge#full-options
-    css_class: 'codehilite'
-    span:
-      line_numbers: false
-    block:
-      line_numbers: true
-      start_line: 1
-    table_class: 'table'
-    gutter_class: 'gutter'
-    code_class: 'code'
+    #css_class: 'codehilite'
+    #span:
+    #  line_numbers: false
+    #block:
+    #  line_numbers: true
+    #  start_line: 1
+    #table_class: 'table'
+    #gutter_class: 'gutter'
+    #code_class: 'code'
+    #disable : true
 
 
 
