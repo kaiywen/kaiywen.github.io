@@ -4,7 +4,7 @@ title:      Lock-free 编程：A Case Study（下）
 subtitle:   "Hazard Pointer"
 date:       2018-02-07 15:38:21
 author:     "YuanBao"
-header-img: "img/post-bg-re-vs-ng2.jpg"
+header-img: "img/programming-tips.jpeg"
 header-mask: 0.25
 catalog: true
 tags:
